@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+
+sources = [
+  "SETUP.md",
+  "TRACK_HINTS.md",
+  "exercises/TRACK_HINTS.md",
+]
+destination = "docs/EXERCISE_README_INSERT.md"
+
+message = <<-EOM
+Rename the global exercise hints file
+
+We've had some difficulty coming up with a good name for the file
+that gets included in all of the exercise READMEs for a given track.
+
+These are global hints, like how to run the test suite, which are
+relevant to all the exercises on a track.
+
+We started with SETUP.md in the root of the repository, then renamed
+that to exercises/TRACK_HINTS.md because SETUP.md was misleading and
+confusing, but then we realized that TRACK_HINTS.md was a bit ambiguous
+and confusing as well.
+
+Finally we settled on putting the file in the docs directory, since
+this is user-facing documentation, and calling the file
+EXERCISE_README_INSERT.md
+
+See https://github.com/exercism/meta/issues/5 for context.
+EOM
+
+pwd = Dir.pwd
+Dir.glob('./tracks/*').each do |dir|
+  Dir.chdir(dir)
+  system("git checkout master")
+  system("git pull --rebase origin master")
+  system("git checkout -b readme-insert")
+
+  found = false
+  sources.each do |source|
+    if File.exist?(source)
+      found = true
+      FileUtils.mv(source, destination)
+      system "git rm %s" % source
+    end
+  end
+  if !found
+    FileUtils.touch(destination)
+  end
+  system "git add %s" % destination
+
+  system "git commit -m \"%s\"" % message
+  system "git push origin readme-insert"
+  system "hub pull-request -m \"%s\"" % message
+
+  Dir.chdir(pwd)
+  sleep 4 # avoid hitting abuse limits against the GitHub API
+end
