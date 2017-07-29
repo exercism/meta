@@ -59,9 +59,6 @@ class PRScript
 
   def each(&block)
     tracks.each do |track|
-      Dir.chdir root
-      Dir.chdir File.join(root, 'tracks', track.id)
-
       yield track
     end
   end
