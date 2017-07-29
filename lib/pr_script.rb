@@ -65,10 +65,4 @@ class PRScript
       yield track
     end
   end
-
-  private
-
-  def root
-    @root ||= Dir.pwd
-  end
 end
