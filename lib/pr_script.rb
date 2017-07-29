@@ -16,7 +16,7 @@ class Track
   end
 
   def reset
-    system("git reset --hard && git checkout master && git pull --rebase origin master")
+    system("git reset --hard && git checkout master && git pull --rebase upstream master")
   end
 
   def has_branch?(name)
